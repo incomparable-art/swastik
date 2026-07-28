@@ -46,7 +46,7 @@ def index():
                 subject="🔧 New Service Request | Swastik Technology & Services",
                 sender=formataddr(("Swastik Technology & Services", "247668.swastik@gmail.com")),
                 recipients=[
-                    formataddr(("Service Team", "info.swastik@gmail.com"))
+                    formataddr(("Service Team", "query.swastik@gmail.com"))
                 ],
                 cc=[
                     formataddr(("Customer", email)),
