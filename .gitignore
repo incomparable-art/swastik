@@ -1,1 +1,6 @@
 .idea/
+.env
+mydata
+.venv/
+config.txt
+__pycache__/
