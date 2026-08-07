@@ -1,13 +1,9 @@
 import os
-from flask_mail import Mail, Message
-from flask import Flask, render_template, request, flash, redirect, session, url_for, g
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_mail import Mail
+from flask import Flask
+from flask_login import LoginManager
 from datetime import timedelta
-from email.utils import formataddr
 from flask_bcrypt import Bcrypt
-from dotenv import load_dotenv
-import traceback
-from swastikapp.database import User
 
 app = Flask(__name__)
 

@@ -1,14 +1,13 @@
-from swastikapp import *
-# from flask import render_template, request, flash, redirect, session, url_for
-# from flask_login import login_user, logout_user, current_user
-# from swastikapp.database import User
-
+from swastikapp import login_manager, bcrypt
+from flask import render_template, request, flash, redirect, session, url_for
+from flask_login import login_user, logout_user, current_user
+from swastikapp.database import User, MongoDatabase
 
 # ✅ Put @login_manager.user_loader HERE inside main file
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get_by_id(user_id)
-
+    with MongoDatabase() as mongo:
+        return mongo.get_user_by_id(user_id)
 
 def signup():
     # Redirect if user is already logged in
@@ -22,24 +21,31 @@ def signup():
             contact = request.form.get('phone')
             password = request.form.get('password')
 
-            existing_user = User.get_by_email(email)
-            if existing_user:
-                flash("An account with this email already exists.", "warning")
-                return redirect(url_for('route_signup'))
-
             pw_hash = bcrypt.generate_password_hash(password)
 
-            User.add_user(name, email, contact, pw_hash)
-            flash("Your account successfully created.", "info")
+            with MongoDatabase() as mongo:
+                # 2. Check if user already exists
+                if mongo.get_user_by_email(email):
+                    flash("An account with this email already exists.", "warning")
+                    return redirect(url_for('route_signup'))
 
-            return redirect(url_for('route_admin_login'))
+                # 3. Create user and get User object back
+                new_user = mongo.create_user(
+                    name=name,
+                    email=email,
+                    password_hash=pw_hash,
+                    contact=contact,
+                    role="user"
+                )
+                print(new_user)
 
+                flash("Your account successfully created.", "info")
+                return redirect(url_for('route_admin_login'))
         except Exception as exp:
             print('add_user() :: Got exception: %s' % exp)
             return redirect(url_for('route_signup'))
     else:
         return render_template("admin/signup.html")
-
 
 def login():
     # Redirect if user is already logged in
@@ -52,31 +58,27 @@ def login():
             password = request.form.get('password')
             remember = True if request.form.get('remember') else False
 
-            # Look up user in MongoDB
-            user = User.get_by_email(email)
-
-            if user.role == "admin":
-                # Verify existence and password hash
+            with MongoDatabase() as mongo:
+                user = mongo.get_user_by_email(email)
+                # Check password hash (handling bytes or str)
                 if user and bcrypt.check_password_hash(user.pw_hash, password):
-                    # Wrap in User class and log in directly
-                    session.permanent = True
-                    login_user(user, remember=remember)
-
-                    # Redirect to originally requested page if 'next' param exists
-                    next_page = request.args.get('next')
-                    return redirect(next_page or url_for('route_dashboard'))
+                    if user.role == "admin":
+                        # Wrap in User class and log in directly
+                        session.permanent = True
+                        login_user(user, remember=remember)
+                        return redirect(url_for('route_dashboard'))
+                    else:
+                        flash("You can't access this without admin permission. ", "danger")
+                        return redirect(url_for('route_admin_login'))
                 else:
                     flash("Invalid email or password.", "danger")
                     return redirect (url_for('route_admin_login'))
-            else:
-                flash("You can't access this without admin permission. ", "danger")
-                return redirect(url_for('route_admin_login'))
+
         except Exception as e:
             print(e)
             return redirect(url_for('route_admin_login'))
     else:
         return render_template('admin/login.html')
-
 
 def logout():
     # Clears user session from Flask-Login

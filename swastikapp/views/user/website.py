@@ -1,5 +1,8 @@
-from swastikapp import *
-
+from flask import render_template, request, flash, redirect, session, url_for
+from email.utils import formataddr
+from flask_mail import Message
+from swastikapp import mail
+import os
 
 def index():
     if request.method == 'POST':
