@@ -1,5 +1,5 @@
 import os
-import certifi
+# import certifi
 from pymongo import MongoClient
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from bson import ObjectId
@@ -9,14 +9,15 @@ import traceback
 import json
 import datetime
 
-# load_dotenv()
+load_dotenv()
 
 
 # Database Setup
-# conn_str = os.getenv("CONNECTION_STRING")
-client = MongoClient("mongodb+srv://swastik_db_user:gv27hDeoU9oRVnRg@cluster0.kixaggw.mongodb.net/", tlsCAFile=certifi.where())
-# client = MongoClient(uri, tlsCAFile=certifi.where())
-db = client["swastik_db"]
+conn_str = os.getenv("CONNECTION_STRING")
+database_name = os.getenv("DATABASE_NAME")
+# client = MongoClient("mongodb+srv://swastik_db_user:gv27hDeoU9oRVnRg@cluster0.kixaggw.mongodb.net/", tlsCAFile=certifi.where())
+client = MongoClient(conn_str)
+db = client[database_name]
 
 # User wrapper class for Flask-Login
 class User(UserMixin):
