@@ -13,7 +13,7 @@ def route_signup():
 def route_admin_login():
     return login()
 
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def route_dashboard():
     return dashboard()
