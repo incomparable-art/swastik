@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Swastik Technology & Services</title>
+  <title>Swastik Technology & Services | HPLC & GC Analytical Instrument Services</title>
   <!-- Fonts and icons (External CDNs - Keep as is) -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
 
@@ -90,12 +90,12 @@
           </li> -->
           <li class="flex items-center">
             {% if current_user %}
-            <a href="{{ url_for('logout') }}" class="block px-0 py-2 text-sm font-semibold text-white transition-all ease-nav-brand">
+            <a href="{{ url_for('route_admin_logout') }}" class="block px-0 py-2 text-sm font-semibold text-white transition-all ease-nav-brand">
               <i class="fa fa-user sm:mr-1"></i>
               <span class="hidden sm:inline">Logout</span>
             </a>
             {% else %}
-            <a href="{{ url_for('login') }}" class="block px-0 py-2 text-sm font-semibold text-white transition-all ease-nav-brand">
+            <a href="{{ url_for('route_admin_login') }}" class="block px-0 py-2 text-sm font-semibold text-white transition-all ease-nav-brand">
               <i class="fa fa-user sm:mr-1"></i>
               <span class="hidden sm:inline">Sign In</span>
             </a>
