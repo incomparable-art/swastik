@@ -135,8 +135,8 @@ def login():
         except Exception as e:
             print(e)
             return redirect(url_for('login'))
-
-    return render_template('admin/sign-in.html')
+    else:
+        return render_template('admin/sign-in.html')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
