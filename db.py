@@ -4,10 +4,10 @@ from pymongo import MongoClient
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from bson import ObjectId
 from dotenv import load_dotenv
+import datetime
 import traceback
 
 import json
-import datetime
 
 load_dotenv()
 
