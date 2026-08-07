@@ -1,13 +1,11 @@
 import os
-# import certifi
 from pymongo import MongoClient
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import UserMixin
 from bson import ObjectId
 from dotenv import load_dotenv
 import datetime
 import traceback
 
-import json
 
 load_dotenv()
 
@@ -15,7 +13,6 @@ load_dotenv()
 # Database Setup
 conn_str = os.getenv("CONNECTION_STRING")
 database_name = os.getenv("DATABASE_NAME")
-# client = MongoClient("mongodb+srv://swastik_db_user:gv27hDeoU9oRVnRg@cluster0.kixaggw.mongodb.net/", tlsCAFile=certifi.where())
 client = MongoClient(conn_str)
 db = client[database_name]
 

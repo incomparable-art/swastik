@@ -4,34 +4,34 @@ from datetime import timedelta
 from flask_mail import Mail, Message
 from email.utils import formataddr
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
+import os
 import traceback
 from db import User
 
 app = Flask(__name__)
 
+load_dotenv()
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-# app.config['MAIL_USE_SSL'] = False
-
-app.config['MAIL_USERNAME'] = '247668.swastik@gmail.com'
-app.config['MAIL_PASSWORD'] = 'gkcumndybwazevzi'
-app.config['MAIL_DEFAULT_SENDER'] = '247668.swastik@gmail.com'
-
-app.config['SECRET_KEY'] = '467d862ed9fcd13bbabe41f76946c9202418bc6566fc9631'
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER")
+app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS")
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 
 # Initialize Extensions
 bcrypt = Bcrypt(app)
+mail = Mail(app)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"  # Redirects unauthenticated users here
 login_manager.login_message_category = "info"
 
-mail = Mail(app)
-
+SESSION_TIME = int(os.getenv("SESSION_TIME"))
 # 1. Configure session lifetime at app setup (NOT inside a request hook)
-app.permanent_session_lifetime = timedelta(minutes=30)
+app.permanent_session_lifetime = timedelta(minutes=SESSION_TIME)
 
 # 2. Use a before_request hook for request-level logic
 @app.before_request
@@ -47,6 +47,7 @@ def before_request():
 @login_manager.user_loader
 def load_user(user_id):
     return User.get_by_id(user_id)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -70,16 +71,18 @@ def index():
                 service = service,
                 detail = detail
             )
+            service_team = os.getenv("SERVICE_TEAM")
+            sales_team = os.getenv("SALES_TEAM")
 
             msg = Message(
                 subject="🔧 New Service Request | Swastik Technology & Services",
                 sender=formataddr(("Swastik Technology & Services", "247668.swastik@gmail.com")),
                 recipients=[
-                    formataddr(("Service Team", "query.swastik@gmail.com"))
+                    formataddr(("Service Team", service_team))
                 ],
                 cc=[
                     formataddr(("Customer", email)),
-                    formataddr(("Sales Team", "gauravdhiman1142@gmail.com"))
+                    formataddr(("Sales Team", sales_team))
                 ]
             )
 
@@ -87,8 +90,6 @@ def index():
             mail.send(msg)
             flash('Email Sent Successfully!')
             return redirect(url_for('dashboard'))
-
-            return "Email Sent Successfully!"
         except Exception as e:
             print(e)
             return render_template('index.html')
@@ -178,11 +179,9 @@ def logout():
     logout_user()
     session.permanent = False
 
-    # Flash feedback message for the user
     flash('You have been logged out successfully.', 'info')
-
-    # Redirect back to sign-in page
     return redirect(url_for('login'))
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.getenv("DEBUG"))
