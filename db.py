@@ -8,12 +8,12 @@ import traceback
 import json
 import datetime
 
-load_dotenv()
+# load_dotenv()
 
 
 # Database Setup
-conn_str = os.getenv("CONNECTION_STRING")
-client = MongoClient(conn_str)
+# conn_str = os.getenv("CONNECTION_STRING")
+client = MongoClient("mongodb+srv://swastik_db_user:gv27hDeoU9oRVnRg@cluster0.kixaggw.mongodb.net/")
 db = client["swastik_db"]
 
 # User wrapper class for Flask-Login

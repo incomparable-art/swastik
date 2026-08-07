@@ -1,4 +1,5 @@
 .idea/
+.env
 mydata
 .venv/
 config.txt
