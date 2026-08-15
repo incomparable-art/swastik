@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice</title>
+
+    <style>
+        .popup-box {
+            width: 995px;
+            max-width: 95%;
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,.25);
+            position: relative;
+        }
+
+        .popup-box h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .row{
+            display:flex;
+            gap:8px;
+            margin-bottom:8px;
+        }
+
+        .row input,
+        .row select{
+            height:28px;
+            padding:0 8px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ff4d4d;
+            color: white;
+            text-align: center;
+            line-height: 32px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: .3s;
+        }
+
+        .close-btn:hover {
+            background: #d63031;
+            transform: scale(1.1);
+        }
+
+        .row,
+        .form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input,
+        select {
+            flex: 1;
+            min-width: 150px;
+            height: 42px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: 14px;
+            transition: .3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,.15);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+
+        }
+
+        .popup {
+            width: 400px;
+            max-width: 90%;
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            animation: popupShow 0.3s ease;
+        }
+
+        .popup h3 {
+            margin: 0 0 10px;
+            color: #333;
+            font-size: 22px;
+        }
+
+        .popup p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .popup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            height: 42px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3cd400,#3cd400);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgb(110 219 52 / 0.3);
+        }
+
+        .section-title {
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .popup-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            border-radius: 15px 15px 0 0;
+            background: linear-gradient(90deg,#3498db,#9b59b6);
+        }
+
+        .btn-secondary {
+            height: 42px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg,#3498db,#2980b9);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(52,152,219,.3);
+        }
+
+        @keyframes popupShow {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family: Arial, sans-serif;
+            background:#fff;
+            padding:15px;
+        }
+
+        .invoice{
+            width:1000px;
+            margin:auto;
+            border:2px solid #000;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        td,th{
+            border:1px solid #000;
+            padding:4px 6px;
+            vertical-align:top;
+
+        }
+
+        .no-border{
+            border:none !important;
+        }
+        .no-border-hor{
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .header{
+            text-align:center;
+            padding:10px;
+        }
+
+        .header h1{
+            font-size:20px;
+            margin-top:2px;
+        }
+
+        .header h2{
+            font-size:16px;
+            text-decoration:underline;
+        }
+
+        .small{
+            font-size:12px;
+        }
+
+        .bold{
+            font-weight:bold;
+        }
+
+        .right{
+            text-align:right;
+        }
+
+        .center{
+            text-align:center;
+        }
+
+        .address{
+            min-height:105px;
+        }
+
+        .amount-box{
+            width:140px;
+        }
+
+        .tax-table{
+            font-size:11px;
+        }
+
+        .footer-sign{
+            height:105px;
+            position:relative;
+        }
+
+        .signatory{
+            position:absolute;
+            bottom:5px;
+            right:10px;
+            font-weight:bold;
+        }
+
+        .terms{
+            font-size:12px;
+            line-height:1.5;
+        }
+        /*.form-border {*/
+        /*    width:1000px;*/
+        /*    margin:auto;*/
+        /*    border: 1px solid #000;*/
+        /*    padding: 20px;*/
+        /*    border-radius: 8px;*/
+        /*}*/
+        input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea {
+            height: 100px;
+            width: 300px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="itemPopup" class="popup-overlay">
+    <div class="popup-box">
+
+        <span class="close-btn" onclick="closePopup()">✖</span>
+
+        <h3>📄 Invoice Details</h3>
+
+        <div class="row">
+            <input type="text" id="invoice" placeholder="Invoice No." oninput="formData()">
+            <input type="date" id="date" oninput="formData()">
+            <input type="text" id="place" placeholder="Place of Supply" oninput="formData()">
+            <input type="text" id="reverse" placeholder="Reverse Charge" oninput="formData()">
+            <input type="text" id="gr" placeholder="GR/RR No." oninput="formData()">
+        </div>
+
+        <div class="row">
+            <input type="text" id="transport" placeholder="Transport" oninput="formData()">
+            <input type="text" id="vehicle" placeholder="Vehicle No." oninput="formData()">
+            <input type="text" id="station" placeholder="Station" oninput="formData()">
+            <input type="text" id="bill" placeholder="E-Way Bill No." oninput="formData()">
+        </div>
+
+        <hr>
+        <h3>📦 Item Details</h3>
+
+        <div class="form">
+            <input type="text" id="description" placeholder="Description of Goods">
+            <input type="text" id="sac" value="90279090" placeholder="HSN/SAC">
+            <input type="number" id="qty1" value="1" placeholder="Quantity">
+            <input type="number" id="rate" placeholder="Rate">
+            <select id="unit">
+                <option>Nos</option>
+                <option>PCS</option>
+                <option>BOX</option>
+            </select>
+            <button class="btn-secondary" onclick="addRow()"> ➕ Add Row </button>
+        </div>
+
+    </div>
+</div>
+
+<div class="invoice">
+
+    <!-- Top Header -->
+    <table>
+        <tr>
+            <td class="bold no-border">GSTIN : 05DRFPA2685N1ZK</td>
+            <td class="right no-border"><i>Original Copy</i></td>
+        </tr>
+    </table>
+
+    <div class="header">
+        <h2>TAX INVOICE</h2>
+        <h1>SWASTIK TECHNOLOGY AND SERVICES</h1>
+        <div>138 A, IQBALPUR ROAD, BEHEDEKI SAIDABAD, JHABRERA,</div>
+        <div>DISTT. HARIDWAR, (UTTARAKHAND) 247668</div>
+        <div>GSTIN/UIN : 05DRFPA2685N1ZK</div>
+        <div>STATE NAME : UTTARAKHAND, CODE : 05</div>
+    </div>
+
+    <!-- Invoice Details -->
+    <table>
+        <tr>
+            <td width="50%">
+                <table>
+                    <tr><td class="no-border">Invoice No.</td><td class="no-border">:</td><td id="invoice1" class="no-border" contenteditable="true">#</td></tr>
+                    <tr><td class="no-border">Dated</td><td class="no-border">:</td><td  id="date1" class="no-border" contenteditable="true">DD-MM-YYYY</td></tr>
+                    <tr><td class="no-border">Place of Supply</td><td class="no-border">:</td><td class="no-border" id="place1" contenteditable="true"></td></tr>
+                    <tr><td class="no-border">Reverse Charge</td><td class="no-border">:</td><td id="reverse1"  class="no-border" contenteditable="true"></td></tr>
+                    <tr><td class="no-border">GR/RR No.</td><td class="no-border">:</td><td  id="gr1" class="no-border" contenteditable="true"></td></tr>
+                </table>
+            </td>
+
+            <td width="50%">
+                <table>
+                    <tr><td class="no-border">Transport</td><td class="no-border">:</td><td id="transport1" class="no-border" contenteditable="true"></td></tr>
+                    <tr><td class="no-border">Vehicle No.</td><td class="no-border">:</td><td id="vehicle1" class="no-border" contenteditable="true"></td></tr>
+                    <tr><td class="no-border">Station</td><td class="no-border">:</td><td id="station1" class="no-border" contenteditable="true"></td></tr>
+                    <tr><td class="no-border">E-Way Bill No.</td><td class="no-border" contenteditable="true">:</td><td id="bill1" class="no-border" contenteditable="true"></td></tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="address" contenteditable="true">
+                <strong><i>Billed To :</i></strong><br>
+                ADLER WOOD INDIA PRIVATE LIMITED<br>
+                S.A.S. NAGAR, TEHSIL DERA BASSI<br>
+                VILLAGE SEEHPUR, SAS NAGAR, Punjab<br>
+                140501<br>
+                GSTIN / UIN : 03AAPCA9865M1ZX<br>
+            </td>
+
+            <td class="address" contenteditable="true">
+                <strong><i>Shipped To :</i></strong><br>
+                ADLER WOOD INDIA PRIVATE LIMITED<br>
+                S.A.S. NAGAR, TEHSIL DERA BASSI<br>
+                VILLAGE SEEHPUR, SAS NAGAR, Punjab<br>
+                140501<br>
+                GSTIN / UIN : 03AAPCA9865M1ZX<br>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr><td style="height:25px;"></td></tr>
+    </table>
+
+    <!-- Goods Table -->
+    <table class="items" id="myTable">
+        <tr>
+            <th width="5%">S.N.</th>
+            <th width="50%">Description of Goods</th>
+            <th width="5%">HSN/SAC</th>
+            <th width="5%">Quantity</th>
+            <th width="5%">Rate</th>
+            <th width="5%">Unit</th>
+            <th width="20%">Amount</th>
+        </tr>
+    </table>
+
+
+    <!-- Totals -->
+    <table>
+        <tr>
+            <td class="center" width="85%">
+                TOTAL TAX AMOUNT<br>
+                <i>Rounded Off (+/-)</i>
+            </td>
+
+            <td  contenteditable="true" class="amount-box right" width="15%">
+                <i><p class="center no-border" id="taxableAmount"> </i><br>
+                <p class="center no-border" id="roundoff">
+            </td>
+        </tr>
+
+        <tr>
+            <td  contenteditable="true" class="center" width="85%">
+                <div class="center" style="font-weight: bold; font-size: 16px; margin-bottom: -20px;">Grand Total</div>
+                <div class="right" style="margin-right: 30px;">Quantity -</div>
+                <div class="right" style="margin-top: -17px;font-weight: bold; font-size: 16px;" id="qty"> 0 </div>
+            </td>
+
+            <td class="right" width="15%">
+                <p class="center no-border" id="grandtotal" style="font-weight: bold; font-size: 16px"><br>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Tax Summary -->
+    <table class="tax-table">
+        <tr>
+            <th>Tax Rate</th>
+            <th>Taxable Amt.</th>
+            <th id="cgst3">CGST</th>
+            <th id="sgst3">SGST</th>
+            <th id="igst3">IGST</th>
+            <th>Total Tax</th>
+        </tr>
+
+        <tr>
+            <td class="center">18%</td>
+            <td class="center"><p class="no-border center" id="_amount"></td>
+            <td class="center"><p class="no-border center" id="_cgst"></td>
+            <td class="center"><p class="no-border center" id="_sgst"></td>
+            <td class="center"><p class="no-border center" id="igst"></td>
+            <td class="center"><p class="no-border center" id="_totaltax"></td>
+        </tr>
+    </table>
+
+    <!-- Amount in Words -->
+    <table>
+        <tr>
+            <td contenteditable="true" >
+                <p id="toWord">
+            </td>
+            <!--                    Rupees EIGHTY TWO THOUSAND SIX HUNDRED ONLY-->
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr><td style="height:25px;"></td></tr>
+    </table>
+
+    <!-- Bank Details -->
+    <table>
+        <tr>
+
+            <td><strong>Bank Details :</strong>
+                <table style="margin-left: 250px; width: 60%">
+                    <tr><td class="no-border">A/c Holder's Name</td><td class="no-border">:</td><td class="no-border">SWASTIK TECHNOLOGY AND SERVICES</td></tr>
+                    <tr><td class="no-border">Bank Name</td><td class="no-border">:</td><td class="no-border">SBI BANK</td></tr>
+                    <tr><td class="no-border">A/c No.</td><td class="no-border">:</td><td class="no-border">45097188734</td></tr>
+                    <tr><td class="no-border">Branch & IFS Code</td><td class="no-border">:</td><td class="no-border">IQBALPUR KAMELPUR & SBIN0013435</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
+    <table>
+        <tr>
+            <td width="45%" class="terms">
+                <strong><u>Terms & Conditions</u></strong><br>
+                E.& O.E.<br>
+                1. Goods once sold will not be taken back.<br>
+                2. Interest @ 18% p.a. will be charged if the payment
+                is not made within the stipulated time.<br>
+                3. Subject to 'Haridwar' Jurisdiction only.
+            </td>
+
+            <td width="55%" class="footer-sign">
+                <strong>Receiver's Signature :</strong>
+
+                <div style="text-align:center;margin-top:30px;">
+                    <strong>SWASTIK TECHNOLOGY AND SERVICES</strong><br>
+                    <span style="font-size: 10px; color: #444;">This is a computer-generated invoice.<br>
+                        No physical signature required.</span>
+                </div>
+
+                <div class="signatory">
+                    Authorised signatory
+                </div>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<!-- Popup Overlay -->
+<div id="popupOverlay" class="popup-overlay">
+    <div class="popup">
+        <h3>Select Tax Type</h3>
+        <p>Please choose the applicable GST type.</p>
+
+        <div class="popup-buttons">
+            <button class="btn btn-primary" onclick="selectTax('IGST')">
+                IGST
+            </button>
+
+            <button class="btn btn-secondary" onclick="selectTax('CGST_SGST')">
+                CGST / SGST
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+<script>
+    function numberToWords(num) {
+
+        const a = [
+            '', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN',
+            'EIGHT', 'NINE', 'TEN', 'ELEVEN', 'TWELVE', 'THIRTEEN',
+            'FOURTEEN', 'FIFTEEN', 'SIXTEEN', 'SEVENTEEN', 'EIGHTEEN',
+            'NINETEEN'
+        ];
+
+        const b = [
+            '', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY',
+            'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'
+        ];
+
+
+        function inWords(n) {
+            if (n < 20) return a[n];
+            if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? ' ' + a[n % 10] : '');
+            if (n < 1000)
+                return a[Math.floor(n / 100)] + ' HUNDRED' +
+                    (n % 100 ? ' ' + inWords(n % 100) : '');
+            if (n < 100000)
+                return inWords(Math.floor(n / 1000)) + ' THOUSAND' +
+                    (n % 1000 ? ' ' + inWords(n % 1000) : '');
+            if (n < 10000000)
+                return inWords(Math.floor(n / 100000)) + ' LAKH' +
+                    (n % 100000 ? ' ' + inWords(n % 100000) : '');
+
+            return inWords(Math.floor(n / 10000000)) + ' CRORE' +
+                (n % 10000000 ? ' ' + inWords(n % 10000000) : '');
+        }
+
+        return inWords(num);
+    }
+
+    function formData(){
+
+        // Get values
+        let invoice = String(document.getElementById("invoice").value);
+
+        let dateValue = document.getElementById("date").value;
+
+        let date = dateValue
+            ? new Date(dateValue).toLocaleDateString('en-GB') // DD/MM/YYYY
+            : 'NA';
+
+        let place = String(document.getElementById("place").value) || 'NA';
+        let reverse = String(document.getElementById("reverse").value) || 'NA';
+        let gr = String(document.getElementById("gr").value) || 'NA';
+        let vehicle = String(document.getElementById("vehicle").value) || 'NA';
+        let transport = String(document.getElementById("transport").value) || 'NA';
+        let station = String(document.getElementById("station").value) || 'NA';
+        let bill = String(document.getElementById("bill").value) || 'NA';
+
+        // Display values
+        document.getElementById("invoice1").textContent = invoice;
+        document.getElementById("date1").textContent = date;
+        document.getElementById("place1").textContent = place;
+        document.getElementById("reverse1").textContent = reverse;
+        document.getElementById("gr1").textContent = gr;
+        document.getElementById("vehicle1").textContent = vehicle;
+        document.getElementById("transport1").textContent = transport;
+        document.getElementById("station1").textContent = station;
+        document.getElementById("bill1").textContent = bill;
+
+    }
+
+    function removeDiv1() {
+        document.getElementById("myDiv1").remove()
+    }
+
+    function removeDiv2() {
+        document.getElementById("myDiv2").remove()
+    }
+
+
+    function addRow() {
+        let description = document.getElementById("description").value;
+        let sac = document.getElementById("sac").value;
+        let qty = document.getElementById("qty1").value;
+        let rate = document.getElementById("rate").value;
+        let unit = document.getElementById("unit").value;
+
+        if (!description || !sac || !qty|| !rate || !unit) {
+            alert("Please fill all fields");
+            return;
+        }
+
+        let table = document.getElementById("myTable");
+        let srNo = table.rows.length;
+
+        let row = table.insertRow();
+
+        let td1 = row.insertCell(0);
+        td1.id = "sr_" + srNo;
+        td1.classList.add("center", "no-border-hor");
+        td1.innerText = srNo;
+
+        let td2 = row.insertCell(1);
+        td2.id = "description_" + srNo;
+        td2.classList.add("no-border-hor");
+        td2.innerText = description;
+
+        let td3 = row.insertCell(2);
+        td3.id = "sac_" + srNo;
+        td3.classList.add("center", "no-border-hor");
+        td3.innerText = sac;
+
+        let td4 = row.insertCell(3);
+        td4.id = "qty_" + srNo;
+        td4.classList.add("center", "no-border-hor");
+        td4.innerText = qty;
+
+        let td5 = row.insertCell(4);
+        td5.id = "rate_" + srNo;
+        td5.classList.add("center", "no-border-hor");
+        td5.innerText = rate;
+
+        let td6 = row.insertCell(5);
+        td6.id = "per_" + srNo;
+        td6.classList.add("center", "no-border-hor");
+        td6.innerText = unit;
+
+        let td7 = row.insertCell(6);
+        td7.id = "amount_" + srNo;
+        td7.classList.add("center", "no-border-hor");
+        td7.innerText = qty * rate;
+
+        // row.insertCell(0).innerText = sr;
+        // row.insertCell(1).innerText = description;
+        // row.insertCell(2).innerText = sac;
+        // row.insertCell(3).innerText = qty;
+        // row.insertCell(4).innerText = rate;
+        // row.insertCell(5).innerText = unit;
+        // row.insertCell(6).innerText = amount;
+
+        // row.insertCell(7).innerHTML =
+        //     '<button onclick="removeRow(this)">Remove</button>';
+
+        // Clear inputs
+        // document.getElementById("sr").value = "";
+        // document.getElementById("description").value = "";
+        // document.getElementById("sac").value = "";
+        // document.getElementById("qty1").value = "";
+        // document.getElementById("rate").value = "";
+        // document.getElementById("unit").value = "";
+        // document.getElementById("amount").value = "";
+
+        const rows = document.querySelectorAll("#myTable tr");
+
+        let taxableAmount = 0
+        let count = 0
+        let qty1 = 0
+        let cgst = 0
+        let sgst = 0
+        let igst = 0
+        let finalTotal = 0
+        let totalTax = cgst + sgst;
+        let roundedTotal = 0
+        let roundOff = 0
+        let grandTotal = 0
+        let toWord = 0
+
+        rows.forEach((row, rowIndex) => {
+
+            const descTd = row.querySelectorAll('td')[1];
+            const amountTd = row.querySelectorAll('td')[6];
+
+            const rowData = [];
+
+            const sr = row.querySelector("#sr_"+ rowIndex);
+            const qty = row.querySelector("#qty_"+ rowIndex);
+            const rate = row.querySelector("#rate_"+ rowIndex);
+            const amount = row.querySelector("#amount_"+ rowIndex);
+
+            if (sr) rowData.push(sr.innerText);
+            if (qty) rowData.push(qty.innerText);
+            if (rate) rowData.push(rate.innerText);
+            if (amount) rowData.push(amount.innerText);
+
+
+            let _tax = rowData[3]
+            let _qty = rowData[1]
+
+            if (rowIndex === 0) {
+                console.log('Data : ', _tax, rowIndex)
+            } else {
+                taxableAmount = Number(taxableAmount)+Number(_tax)
+                qty1 = Number(qty1)+Number(_qty)
+                count = Number(count)+1
+
+                cgst = taxableAmount * 0.09;
+                sgst = taxableAmount * 0.09;
+                igst = taxableAmount * 0.18;
+                totalTax = cgst + sgst;
+                grandTotal = taxableAmount + totalTax;
+                roundedTotal = Math.round(grandTotal);
+                roundOff = roundedTotal - grandTotal;
+                finalTotal = grandTotal + roundOff;
+                toWord = numberToWords(finalTotal) + " RUPEES ONLY";
+            }
+
+            let zero = 0
+            const taxType = localStorage.getItem('taxType');
+            // Display values
+            document.getElementById("_amount").textContent = taxableAmount;
+            document.getElementById("qty").textContent = qty1;
+
+
+            if (taxType === "CGST_SGST"){
+                document.getElementById("igst").textContent = zero.toFixed(2);
+                document.getElementById("_cgst").textContent = cgst.toFixed(2);
+                document.getElementById("_sgst").textContent = sgst.toFixed(2);
+            }
+            else{
+                document.getElementById("igst").textContent = igst.toFixed(2);
+                document.getElementById("_cgst").textContent = zero.toFixed(2);
+                document.getElementById("_sgst").textContent = zero.toFixed(2);
+            }
+
+
+            document.getElementById("_totaltax").textContent = totalTax.toFixed(2);
+            document.getElementById("taxableAmount").textContent = totalTax.toFixed(2);
+            document.getElementById("roundoff").textContent = roundOff.toFixed(2);
+            document.getElementById("grandtotal").textContent = finalTotal.toFixed(2);
+            document.getElementById("toWord").textContent = toWord;
+
+
+            // document.getElementById("igst").textContent = totalTax.toFixed(2);
+            if (rowIndex === rows.length - 1)
+            {
+                // alert(`180px : ${rows.length-1}`);
+
+                row.style.height = '180px';
+                descTd.style.position = 'relative';
+                amountTd.style.position = 'relative';
+                const cgstTd = `cgst_${rowIndex}`;
+                const sgstTd = `sgst_${rowIndex}`;
+                if (taxType === "CGST_SGST"){
+                    descTd.innerHTML += `<p id="${cgstTd}" class="right" style="margin-top:100px;">CGST <br> SGST</p>`;
+                    amountTd.innerHTML += `<p id="${sgstTd}" class="center" style="margin-top:100px;">${cgst.toFixed(2)} <br> ${sgst.toFixed(2)}</p>`;
+                }
+                else {
+                    descTd.innerHTML += `<p id="${cgstTd}" class="right" style="margin-top:120px;">IGST</p>`;
+                    amountTd.innerHTML += `<p id="${sgstTd}" class="center" style="margin-top:120px;">${igst.toFixed(2)}</p>`;
+                }
+
+                console.log(taxType);
+
+            }
+            else
+            {
+                row.style.height = '10px';
+
+                const cgstTd = `cgst_${rows.length-2}`;
+                const sgstTd = `sgst_${rows.length-2}`;
+
+                const igstElement = document.getElementById(cgstTd);
+                const _igstElement = document.getElementById(sgstTd);
+
+                if (igstElement) {
+                    igstElement.remove();
+                    _igstElement.remove();
+                }
+            }
+        });
+
+    }
+
+    function removeRow(button) {
+        button.parentElement.parentElement.remove();
+    }
+    window.onload = function () {
+        const result = confirm("Choose an option:\nOK = IGST\nCancel = CGST/SGST");
+
+        if (result) {
+            console.log("IGST selected");
+        } else {
+            console.log("CGST/SGST selected");
+        }
+    };
+    window.onload = function () {
+        document.getElementById("popupOverlay").style.display = "flex";
+    };
+
+    function selectTax(type) {
+        console.log("Selected:", type);
+        localStorage.setItem('taxType', type);
+
+        // Your IGST/CGST logic here
+
+        document.getElementById("popupOverlay").style.display = "none";
+
+
+    }
+    function closePopup() {
+        document.getElementById("itemPopup").style.display = "none";
+    }
+
+</script>
