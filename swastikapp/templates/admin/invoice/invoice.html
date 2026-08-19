@@ -37,6 +37,9 @@
               <tbody>
               {% for invoice in pagination.invoices %}
               {% if invoice.status == "deleted" %}
+              <tr>
+                <td colspan="5" style="text-align: center;">No records found.</td>
+              </tr>
               {% else %}
               <tr>
                 <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
