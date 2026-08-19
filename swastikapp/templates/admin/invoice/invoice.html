@@ -63,13 +63,13 @@
                   <span class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">{{invoice.buyer_gstin}}</span>
                 </td>
                 <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                  <a href="edit-invoice/{{invoice.id}}" class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">
+                  <a href="edit-invoice/{{invoice._id}}" class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">
                     <i class="mr-1 text-lg leading-none fas fa-pencil" style="color: #6612eb;"></i></a></a>
 
-                  <a href="generate-invoice-pdf/{{invoice.id}}" target="_blank" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
+                  <a href="generate-invoice-pdf/{{invoice._id}}" target="_blank" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
                     <i class="mr-1 text-lg leading-none fas fa-print" style="color: #79b51d;"></i></a>
 
-                  <a href="delete-invoice/{{invoice.id}}" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
+                  <a href="delete-invoice/{{invoice._id}}" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
                     <i class="mr-1 text-lg leading-none fas fa-trash" style="color: #ef6c37;"></i></a>
                 </td>
               </tr>
@@ -94,6 +94,10 @@
                 <a href="?page={{ p }}" class="page-btn {% if p == pagination.page %}active{% endif %}">
                   {{ p }}
                 </a>
+                {% else %}
+                <tr>
+                  <td colspan="5" style="text-align: center;">No records found.</td>
+                </tr>
                 {% endfor %}
 
                 <!-- Next Button -->
@@ -156,16 +160,20 @@
                   <span class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">{{invoice.buyer_gstin}}</span>
                 </td>
                 <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                  <a href="edit-invoice/{{invoice.id}}" class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">
+                  <a href="edit-invoice/{{invoice._id}}" class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">
                     <i class="mr-1 text-lg leading-none fas fa-pencil" style="color: #6612eb;"></i></a></a>
 
-                  <a href="generate-invoice-pdf/{{invoice.id}}" target="_blank" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
+                  <a href="generate-invoice-pdf/{{invoice._id}}" target="_blank" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
                     <i class="mr-1 text-lg leading-none fas fa-print" style="color: #79b51d;"></i></a>
 
                 </td>
               </tr>
               {% endif %}
 
+              {% else %}
+              <tr>
+                <td colspan="5" style="text-align: center;">No records found.</td>
+              </tr>
               {% endfor %}
               </tbody>
             </table>

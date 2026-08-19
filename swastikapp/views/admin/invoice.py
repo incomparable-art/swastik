@@ -27,7 +27,7 @@ def tables():
 
 def invoice():
     page = request.args.get('page', 1, type=int)
-    per_page = 8
+    per_page = 5
     filter_query = {}
 
     with MongoDatabase() as mongo:

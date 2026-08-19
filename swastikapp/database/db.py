@@ -66,6 +66,7 @@ class MongoDatabase:
         for doc in cursor:
             doc["_id"] = str(doc["_id"])
             invoices.append(doc)
+        print(invoices)
 
         return {
             "invoices": invoices,
