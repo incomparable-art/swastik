@@ -74,11 +74,11 @@
                 </td>
               </tr>
               {% endif %}
+
               {% else %}
               <tr>
                 <td colspan="5" style="text-align: center;">No records found.</td>
               </tr>
-              {% endfor %}
 
               {% endfor %}
               </tbody>
@@ -99,6 +99,7 @@
                 <a href="?page={{ p }}" class="page-btn {% if p == pagination.page %}active{% endif %}">
                   {{ p }}
                 </a>
+                {% endfor %}
 
                 <!-- Next Button -->
                 <a style="margin-right: 15px;" href="?page={{ pagination.next_num }}" class="page-btn {% if not pagination.has_next %}disabled{% endif %}">
