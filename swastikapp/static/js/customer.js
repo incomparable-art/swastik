@@ -134,7 +134,7 @@ $('#addCustomerForm').on('submit', function(e) {
         success: function(response) {
             $('#statusMessage')
                 .css('color', '#10b981')
-                .text(response.responseJSON.message)
+                .text(response.message)
                 .fadeIn();
 
             loadCustomers();
@@ -154,8 +154,6 @@ $('#addCustomerForm').on('submit', function(e) {
 });
 
 // Update functionality
-
-
 $(document).on('click', '.btn-edit1', function() {
 
     // 1. Get only the User ID from the button
@@ -175,12 +173,6 @@ $(document).on('click', '.btn-edit1', function() {
 
             // 4. Open Modal
             $('#editModalOverlay').addClass('active');
-
-            $('#statusMsg')
-                .css('color', '#10b981')
-                .text(response.responseJSON.message)
-                .fadeIn();
-
         },
         error: function () {
             alert('Could not fetch user details.');
@@ -204,7 +196,7 @@ $('#editCustomerForm').on('submit', function(e) {
         data: $(this).serialize(),
         success: function(response) {
             // Show status message
-            $('#editstatusMessage')
+            $('#statusMsg')
                 .css('color', '#10b981')
                 .text(response.message)
                 .fadeIn();

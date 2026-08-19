@@ -1,0 +1,252 @@
+
+{% include 'admin/includes/sidebar.html' %}
+<style>
+  body { font-family: Arial, sans-serif; background: #f1f5f9; padding: 20px; }
+  .form-container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .section-title { border-bottom: 2px solid #6366f1; padding-bottom: 5px; margin-top: 20px; color: #1e293b; }
+  .row { display: flex; gap: 15px; margin-bottom: 12px; }
+  .col { flex: 1; }
+  label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; color: #475569; }
+  input, select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+  th { background: #f8fafc; }
+  .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+  .btn-add { background: #10b981; color: white; margin-top: 8px; }
+  .btn-submit { background: #6366f1; color: white; width: 100%; margin-top: 20px; font-size: 1rem; }
+</style>
+
+{% include 'admin/includes/header.html' %}
+
+<div class="w-full px-6 py-6 mx-auto">
+  <!-- table 1 -->
+
+  <div class="flex flex-wrap -mx-3">
+    <div class="flex-none w-full max-w-full px-3">
+      <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+          <h6 class="dark:text-white">Authors table</h6>
+        </div>
+        <div class="flex-auto px-0 pt-0 pb-2">
+          <div class="p-0 overflow-x-auto">
+            <div class="form-container">
+              <h2>Generate Tax Invoice</h2>
+              <form action="/edit-invoice/{{invoice.id}}" method="POST" target="_blank" id="invoiceForm">
+                <input type="hidden" name="id" value="{{invoice.id}}">
+
+                <!-- Invoice Metadata -->
+                <h4 class="section-title">Invoice Details</h4>
+                <div class="row">
+                  <div class="col"><label>Invoice No:</label><input type="text" name="invoice_no" value="{{invoice.invoice_no}}" required></div>
+                  <div class="col"><label>Date:</label><input type="date" name="invoice_date" value="{{invoice.invoice_date}}" required></div>
+                  <div class="col"><label>Place of Supply:</label><input type="text" name="place_of_supply" value="{{invoice.place_of_supply}}"></div>
+                  <div class="col"><label>Reverse Charge:</label><input type="text" name="reverse_charge" value="{{invoice.reverse_charge}}"></div>
+                  <div class="col"><label>GR/RR No.:</label><input type="text" name="rr_no" value="{{invoice.rr_no}}"></div>
+                </div>
+                <div class="row">
+                  <div class="col"><label>Transport:</label><input type="text" name="transport" value="{{invoice.transport}}"></div>
+                  <div class="col"><label>Vehicle No:</label><input type="text" name="vehicle_no" value="{{invoice.vehicle_no}}"></div>
+                  <div class="col"><label>Station:</label><input type="text" name="station" value="{{invoice.station}}"></div>
+                  <div class="col"><label>E-Way Bill No:</label><input type="text" name="eway_bill" value="{{invoice.eway_bill}}"></div>
+                </div>
+
+                <!-- Billed To / Shipped To -->
+                <h4 class="section-title">Buyer Details</h4>
+                <div class="row">
+                  <div class="col">
+                    <label>Billed To (Company Name):</label>
+
+                    <select id="buyerSelect" name="buyer_name" required>
+                      {% for customer in customers %}
+                      <option value="{{ customer.name }}" data-gstin="{{ customer.tin }}" data-address="{{ customer.address }}"
+                              {% if invoice.buyer_name == customer.name %} selected {% endif %}>
+                        {{ customer.name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col">
+                    <label>GSTIN / UIN:</label>
+                    <input type="text" id="buyerGstin" name="buyer_gstin" value="{{invoice.buyer_gstin}}" required>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <label>Address:</label>
+                    <input type="text" id="buyerAddress" name="buyer_address" value="{{invoice.buyer_address}}" required>
+                  </div>
+                </div>
+
+                <!-- Items Table -->
+                <h4 class="section-title">Items / Description of Goods</h4>
+                <table id="itemsTable">
+                  <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>HSN/SAC</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                  </tr>
+                  </thead>
+                  <tbody id="itemsBody">
+                  {% for item in invoice.items%}
+                  <tr>
+                    <td><input type="text" name="item_desc[]" value="{{item.desc}}" required></td>
+                    <td><input type="text" name="item_hsn[]" value="{{item.hsn}}"></td>
+                    <td><input type="number" name="item_qty[]" value="{{item.qty}}" class="qty"></td>
+                    <td><input type="text" name="item_unit[]" value="{{item.unit}}"></td>
+                    <td><input type="number" name="item_rate[]" value="{{item.rate}}" class="rate"></td>
+                    <td><input type="number" name="item_amt[]" value="{{item.amount}}" class="amt" readonly></td>
+                    <td><button type="button" onclick="$(this).closest('tr').remove(); calculateTotal();">❌</button></td>
+                  </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+                <button type="button" class="btn btn-add" id="addRowBtn">+ Add Item</button>
+
+                <!-- Summary & Taxes -->
+                <h4 class="section-title">Tax & Totals</h4>
+                <div class="row">
+                  <select id="gstSelect" name="taxtype" required>
+                    <option value="CGST/SGST" {% if invoice.taxtype == 'CGST/SGST' %} selected {% endif %}>
+                    CGST/SGST
+                    </option>
+                    <option value="IGST" {% if invoice.taxtype == 'IGST' %}selected{% endif %}>
+                    IGST
+                    </option>
+                  </select>
+                </div>
+
+                <div class="row">
+                  <div class="col"><label>Taxable Amount:</label><input type="number" id="taxableAmt" name="taxable_amount" value="{{invoice.taxable_amount}}" readonly></div>
+                  <div class="col"><label>Tax Rate (%):</label>
+                    <input type="number" id="taxRate" name="tax_rate" value="18"></div>
+                  <div class="col"><label>TAX (₹):</label>
+                    <input type="number" id="total_tax" name="total_tax" value="{{invoice.total_tax}}" readonly></div>
+                  <div class="col"><label>Grand Total (₹):</label>
+                    <input type="number" id="grandTotal" name="grand_total" value="{{invoice.grand_total}}" readonly></div>
+                  <input type="hidden" id="roundOff" name="roundOff" value="{{invoice.roundOff}}">
+                </div>
+                <div class="row">
+                  <div class="col"><label>Amount in Words:</label>
+                    <input type="text" id="amount_in_words"
+                           name="amount_in_words" value="{{invoice.amount_in_words}}" required></div>
+
+                </div>
+
+                <button type="submit" class="btn btn-submit" id="submitBtn">Generate PDF Invoice</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'admin/includes/footer.html' %}
+
+  <script>
+    $(document).ready(function() {
+      $('#invoiceForm').on('submit', function() {
+        handleFormSubmit();
+      });
+
+      $('#buyerSelect').on('change', function() {
+        // Selected option se data attributes read karein
+        let selectedOption = $(this).find(':selected');
+        let gstin = selectedOption.data('gstin') || '';
+        let address = selectedOption.data('address') || '';
+
+        // Input fields me set karein
+        $('#buyerGstin').val(gstin);
+        $('#buyerAddress').val(address);
+      });
+    });
+    function numberToWords(num) {
+
+      const a = [
+        '', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN',
+        'EIGHT', 'NINE', 'TEN', 'ELEVEN', 'TWELVE', 'THIRTEEN',
+        'FOURTEEN', 'FIFTEEN', 'SIXTEEN', 'SEVENTEEN', 'EIGHTEEN',
+        'NINETEEN'
+      ];
+
+      const b = [
+        '', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY',
+        'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'
+      ];
+
+
+      function inWords(n) {
+        if (n < 20) return a[n];
+        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? ' ' + a[n % 10] : '');
+        if (n < 1000)
+          return a[Math.floor(n / 100)] + ' HUNDRED' +
+                  (n % 100 ? ' ' + inWords(n % 100) : '');
+        if (n < 100000)
+          return inWords(Math.floor(n / 1000)) + ' THOUSAND' +
+                  (n % 1000 ? ' ' + inWords(n % 1000) : '');
+        if (n < 10000000)
+          return inWords(Math.floor(n / 100000)) + ' LAKH' +
+                  (n % 100000 ? ' ' + inWords(n % 100000) : '');
+
+        return inWords(Math.floor(n / 10000000)) + ' CRORE' +
+                (n % 10000000 ? ' ' + inWords(n % 10000000) : '');
+      }
+
+      return inWords(num);
+    }
+
+
+    function calculateTotal() {
+      let taxable = 0;
+      $('#itemsBody tr').each(function() {
+        let qty = parseFloat($(this).find('.qty').val()) || 0;
+        let rate = parseFloat($(this).find('.rate').val()) || 0;
+        let amount = qty * rate;
+        $(this).find('.amt').val(amount.toFixed(2));
+        taxable += amount;
+      });
+
+      let ratePercent = parseFloat($('#taxRate').val()) || 0;
+      let igst = (taxable * ratePercent) / 100;
+      let grand = taxable + igst;
+      let grand_total = grand.toFixed(0);
+      let toWord = numberToWords(grand_total) + " RUPEES ONLY";
+      let roundOff = grand_total - grand;
+
+      $('#taxableAmt').val(taxable.toFixed(2));
+      $('#total_tax').val(igst.toFixed(2));
+      $('#grandTotal').val(Math.round(grand).toFixed(2));
+      $('#amount_in_words').val(toWord);
+      $('#roundOff').val(roundOff.toFixed(2));
+    }
+
+    $('#addRowBtn').click(function() {
+      let newRow = `
+            <tr>
+                <td><input type="text" name="item_desc[]" required></td>
+                <td><input type="text" name="item_hsn[]" value="90279090"></td>
+                <td><input type="number" name="item_qty[]" value="1" class="qty"></td>
+                <td><input type="text" name="item_unit[]" value="PCS"></td>
+                <td><input type="number" name="item_rate[]" value="0" class="rate"></td>
+                <td><input type="number" name="item_amt[]" value="0" class="amt" readonly></td>
+                <td><button type="button" onclick="$(this).closest('tr').remove(); calculateTotal();">❌</button></td>
+            </tr>`;
+      $('#itemsBody').append(newRow);
+    });
+
+    $(document).on('input', '.qty, .rate, #taxRate', calculateTotal);
+
+    function handleFormSubmit() {
+      document.getElementById('submitBtn').disabled = true;
+
+      setTimeout(function() {
+        window.location.href = "/invoice";
+      }, 300);
+    }
+  </script>

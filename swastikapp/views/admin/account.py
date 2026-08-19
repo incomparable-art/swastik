@@ -1,7 +1,7 @@
 from swastikapp import login_manager, bcrypt
 from flask import render_template, request, flash, redirect, session, url_for
 from flask_login import login_user, logout_user, current_user
-from swastikapp.database import User, MongoDatabase
+from swastikapp.database.db import User, MongoDatabase
 
 # ✅ Put @login_manager.user_loader HERE inside main file
 @login_manager.user_loader

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice</title>
+
+    <style>
+        .popup-box {
+            width: 995px;
+            max-width: 95%;
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,.25);
+            position: relative;
+        }
+
+        .popup-box h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .row{
+            display:flex;
+            gap:8px;
+            margin-bottom:8px;
+        }
+
+        .row input,
+        .row select{
+            height:28px;
+            padding:0 8px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ff4d4d;
+            color: white;
+            text-align: center;
+            line-height: 32px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: .3s;
+        }
+
+        .close-btn:hover {
+            background: #d63031;
+            transform: scale(1.1);
+        }
+
+        .row,
+        .form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input,
+        select {
+            flex: 1;
+            min-width: 150px;
+            height: 42px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: 14px;
+            transition: .3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,.15);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+
+        }
+
+        .popup {
+            width: 400px;
+            max-width: 90%;
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            animation: popupShow 0.3s ease;
+        }
+
+        .popup h3 {
+            margin: 0 0 10px;
+            color: #333;
+            font-size: 22px;
+        }
+
+        .popup p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .popup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            height: 42px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3cd400,#3cd400);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgb(110 219 52 / 0.3);
+        }
+
+        .section-title {
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .popup-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            border-radius: 15px 15px 0 0;
+            background: linear-gradient(90deg,#3498db,#9b59b6);
+        }
+
+        .btn-secondary {
+            height: 42px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg,#3498db,#2980b9);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(52,152,219,.3);
+        }
+
+        @keyframes popupShow {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family: Arial, sans-serif;
+            background:#fff;
+            padding:15px;
+        }
+
+        .invoice{
+            width:1000px;
+            margin:auto;
+            border:2px solid #000;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        td,th{
+            border:1px solid #000;
+            padding:4px 6px;
+            vertical-align:top;
+
+        }
+
+        .no-border{
+            border:none !important;
+        }
+        .no-border-hor{
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .header{
+            text-align:center;
+            padding:10px;
+        }
+
+        .header h1{
+            font-size:20px;
+            margin-top:2px;
+        }
+
+        .header h2{
+            font-size:16px;
+            text-decoration:underline;
+        }
+
+        .small{
+            font-size:12px;
+        }
+
+        .bold{
+            font-weight:bold;
+        }
+
+        .right{
+            text-align:right;
+        }
+
+        .center{
+            text-align:center;
+        }
+
+        .address{
+            min-height:105px;
+        }
+
+        .amount-box{
+            width:140px;
+        }
+
+        .tax-table{
+            font-size:11px;
+        }
+
+        .footer-sign{
+            height:105px;
+            position:relative;
+        }
+
+        .signatory{
+            position:absolute;
+            bottom:5px;
+            right:10px;
+            font-weight:bold;
+        }
+
+        .terms{
+            font-size:12px;
+            line-height:1.5;
+        }
+        /*.form-border {*/
+        /*    width:1000px;*/
+        /*    margin:auto;*/
+        /*    border: 1px solid #000;*/
+        /*    padding: 20px;*/
+        /*    border-radius: 8px;*/
+        /*}*/
+        input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea {
+            height: 100px;
+            width: 300px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="invoice">
+
+    <!-- Top Header -->
+    <table>
+        <tr>
+            <td class="bold no-border">GSTIN : 05DRFPA2685N1ZK</td>
+            <td class="right no-border"><i>Original Copy</i></td>
+        </tr>
+    </table>
+
+    <div class="header">
+        <h2>TAX INVOICE</h2>
+        <h1>SWASTIK TECHNOLOGY AND SERVICES</h1>
+        <div>138 A, IQBALPUR ROAD, BEHEDEKI SAIDABAD, JHABRERA,</div>
+        <div>DISTT. HARIDWAR, (UTTARAKHAND) 247668</div>
+        <div>GSTIN/UIN : 05DRFPA2685N1ZK</div>
+        <div>STATE NAME : UTTARAKHAND, CODE : 05</div>
+    </div>
+
+    <!-- Invoice Details -->
+    <table>
+        <tr>
+            <td width="50%">
+                <table>
+                    <tr><td class="no-border">Invoice No.</td><td class="no-border">:</td><td id="invoice1" class="no-border" contenteditable="true">{{ invoice_no }}</td></tr>
+                    <tr><td class="no-border">Dated</td><td class="no-border">:</td><td  id="date1" class="no-border" contenteditable="true">
+                        {{invoice_date}}</td></tr>
+                    <tr>
+                        <td class="no-border">Place of Supply</td>
+                        <td class="no-border">:</td>
+                        <td class="no-border" id="place1" contenteditable="true">{{ place_of_supply }}</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border">Reverse Charge</td>
+                        <td class="no-border">:</td>
+                        <td id="reverse1"  class="no-border" contenteditable="true">{{ reverse_charge }}</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border">GR/RR No.</td>
+                        <td class="no-border">:</td>
+                        <td  id="gr1" class="no-border" contenteditable="true">{{ rr_no }}</td></tr>
+                </table>
+            </td>
+
+            <td width="50%">
+                <table>
+                    <tr>
+                        <td class="no-border">Transport</td>
+                        <td class="no-border">:</td>
+                        <td id="transport1" class="no-border" contenteditable="true">{{transport}}</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border">Vehicle No.</td>
+                        <td class="no-border">:</td>
+                        <td id="vehicle1" class="no-border" contenteditable="true">{{vehicle_no}}</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border">Station</td>
+                        <td class="no-border">:</td>
+                        <td id="station1" class="no-border" contenteditable="true">{{station}}</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border">E-Way Bill No.</td>
+                        <td class="no-border" contenteditable="true">:</td>
+                        <td id="bill1" class="no-border" contenteditable="true">{{eway_bill}}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="address" contenteditable="true">
+                <strong><i>Billed To :</i></strong><br>
+                {{buyer_name}}<br>
+                {{buyer_address}}<br>
+                {{buyer_gstin}}<br>
+            </td>
+
+            <td class="address" contenteditable="true">
+                <strong><i>Shipped To :</i></strong><br>
+                {{buyer_name}}<br>
+                {{buyer_address}}<br>
+                {{buyer_gstin}}<br>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr><td style="height:25px;"></td></tr>
+    </table>
+
+    <!-- Goods Table -->
+    <table class="items" id="myTable">
+        <thead>
+        <tr>
+            <th width="5%">S.N.</th>
+            <th width="50%">Description of Goods</th>
+            <th width="5%">HSN/SAC</th>
+            <th width="5%">Quantity</th>
+            <th width="5%">Rate</th>
+            <th width="5%">Unit</th>
+            <th width="20%">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for item in items %}
+
+        {% if items|length == loop.index %}
+        <tr style="height: 180px;">
+            <td class="center no-border-hor">{{ loop.index }}</td>
+            <td class="center no-border-hor">{{ item.desc }}
+                {% if taxtype == "CGST/SGST" %}
+                    <p class="right" style="margin-top:100px;">CGST <br> SGST</p>
+                {% else %}
+                    <p class="right" style="margin-top:120px;">IGST</p>
+                {% endif %}
+            </td>
+            <td class="center no-border-hor">{{ item.hsn }}</td>
+            <td class="center no-border-hor">{{ item.qty }}</td>
+            <td class="center no-border-hor">{{ item.rate }}</td>
+            <td class="center no-border-hor">{{ item.unit }}</td>
+            <td class="center no-border-hor">{{ item.amount }}
+                {% if taxtype == "CGST/SGST" %}
+                    <p class="center" style="margin-top:100px;">{{gst_amount}} <br> {{gst_amount}}</p>
+                {% else %}
+                    <p class="center" style="margin-top:120px;">{{igst_amount}}</p>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td class="center no-border-hor">{{ loop.index }}</td>
+            <td class="center no-border-hor">{{ item.desc }}</td>
+            <td class="center no-border-hor">{{ item.hsn }}</td>
+            <td class="center no-border-hor">{{ item.qty }}</td>
+            <td class="center no-border-hor">{{ item.rate }}</td>
+            <td class="center no-border-hor">{{ item.unit }}</td>
+            <td class="center no-border-hor">{{ item.amount }}</td>
+        </tr>
+        {% endif %}
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <!-- Totals -->
+    <table>
+        <tr>
+            <td class="center" width="85%">
+                TOTAL TAX AMOUNT<br>
+                <i>Rounded Off (+/-)</i>
+            </td>
+
+            <td class="amount-box right" width="15%">
+                <i><p class="center no-border" id="taxableAmount">{{total_tax}} </i><br>
+                <p class="center no-border" id="roundoff">{{roundOff}}</p>
+            </td>
+        </tr>
+
+        <tr>
+            <td  contenteditable="true" class="center" width="85%">
+                <div class="center" style="font-weight: bold; font-size: 16px; margin-bottom: -20px;">Grand Total</div>
+                <div class="right" style="margin-right: 30px; margin-bottom: -20px; ">Quantity -</div>
+                <div class="right" style="margin-top: -22px;font-weight: bold; font-size: 16px;"> {{ items|length }} </div>
+            </td>
+
+            <td class="right" width="15%">
+                <p class="center no-border" style="font-weight: bold; font-size: 16px">{{grand_total}}<br>
+            </td>
+        </tr>
+
+    </table>
+
+    <!-- Tax Summary -->
+    <table class="tax-table">
+        <tr>
+            <th>Tax Rate</th>
+            <th>Taxable Amt.</th>
+            <th id="cgst3">CGST</th>
+            <th id="sgst3">SGST</th>
+            <th id="igst3">IGST</th>
+            <th>Total Tax</th>
+        </tr>
+
+        <tr>
+            <td class="center">18%</td>
+            <td class="center"><p class="no-border center">{{taxable_amount}}</td>
+            <td class="center"><p class="no-border center">{{gst_amount}}</td>
+            <td class="center"><p class="no-border center">{{gst_amount}}</td>
+            <td class="center"><p class="no-border center">{{igst_amount}}</td>
+            <td class="center"><p class="no-border center">{{total_tax}}</td>
+        </tr>
+    </table>
+
+    <!-- Amount in Words -->
+    <table>
+        <tr>
+            <td contenteditable="true" >
+                <p id="toWord">{{amount_in_words}}</p>
+            </td>
+
+        </tr>
+    </table>
+    <table>
+        <tr><td style="height:25px;"></td></tr>
+    </table>
+
+    <!-- Bank Details -->
+    <table>
+        <tr>
+
+            <td><strong>Bank Details :</strong>
+                <table style="margin-left: 250px; width: 60%">
+                    <tr><td class="no-border">A/c Holder's Name</td><td class="no-border">:</td><td class="no-border">SWASTIK TECHNOLOGY AND SERVICES</td></tr>
+                    <tr><td class="no-border">Bank Name</td><td class="no-border">:</td><td class="no-border">SBI BANK</td></tr>
+                    <tr><td class="no-border">A/c No.</td><td class="no-border">:</td><td class="no-border">45097188734</td></tr>
+                    <tr><td class="no-border">Branch & IFS Code</td><td class="no-border">:</td><td class="no-border">IQBALPUR KAMELPUR & SBIN0013435</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
+    <table>
+        <tr>
+            <td width="45%" class="terms">
+                <strong><u>Terms & Conditions</u></strong><br>
+                E.& O.E.<br>
+                1. Goods once sold will not be taken back.<br>
+                2. Interest @ 18% p.a. will be charged if the payment
+                is not made within the stipulated time.<br>
+                3. Subject to 'Haridwar' Jurisdiction only.
+            </td>
+
+            <td width="55%" class="footer-sign">
+                <strong>Receiver's Signature :</strong>
+
+                <div style="text-align:center;margin-top:30px;">
+                    <strong>SWASTIK TECHNOLOGY AND SERVICES</strong><br>
+                    <span style="font-size: 10px; color: #444;">This is a computer-generated invoice.<br>
+                        No physical signature required.</span>
+                </div>
+
+                <div class="signatory">
+                    Authorised signatory
+                </div>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>

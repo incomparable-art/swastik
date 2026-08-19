@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, redirect, session, url_for
+from flask import render_template, request, flash, redirect, url_for
 from email.utils import formataddr
 from flask_mail import Message
 from swastikapp import mail

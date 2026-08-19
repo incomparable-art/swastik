@@ -1,0 +1,179 @@
+<style>
+  .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+  .pagination-nav { display: flex; gap: 5px; }
+  .page-btn { padding: 6px 12px; border: 1px solid #cbd5e1; background: white; text-decoration: none; color: #1e293b; border-radius: 4px; }
+  .page-btn.active { background: #6366f1; color: white; border-color: #6366f1; font-weight: bold; }
+  .page-btn.disabled { color: #94a3b8; pointer-events: none; border-color: #e2e8f0; }
+</style>
+{% include 'admin/includes/sidebar.html' %}
+
+{% include 'admin/includes/header.html' %}
+
+<div class="w-full px-6 py-6 mx-auto">
+  <!-- table 1 -->
+
+  <div class="flex flex-wrap -mx-3">
+    <div class="flex-none w-full max-w-full px-3">
+      <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+          <h6 class="dark:text-white">Invoice Details</h6>
+        </div>
+        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+          <a style="float: right;margin-top: -57px;" class="inline-block px-5 py-2.5 font-bold leading-normal text-center text-white align-middle transition-all bg-transparent rounded-lg cursor-pointer text-sm ease-in shadow-md bg-150 bg-gradient-to-tl from-zinc-800 to-zinc-700 dark:bg-gradient-to-tl dark:from-slate-750 dark:to-gray-850 hover:shadow-xs active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25" href="/add-invoice">
+            <i class="fas fa-plus"> </i>&nbsp;&nbsp;Add New Invoice</a>
+        </div>
+        <div class="flex-auto px-0 pt-0 pb-2">
+          <div class="p-0 overflow-x-auto">
+            <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+              <thead class="align-bottom">
+              <tr>
+                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Invoice / Date</th>
+                <th class="px-6 py-3 pl-2 font-bold text-left uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Type / Grand Total(Tax)</th>
+                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Customer Name</th>
+                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">GST Number</th>
+                <th class="px-6 py-3 font-semibold capitalize align-middle bg-transparent border-b border-collapse border-solid shadow-none dark:border-white/40 dark:text-white tracking-none whitespace-nowrap text-slate-400 opacity-70"></th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for invoice in pagination.invoices %}
+              {% if invoice.status == "deleted" %}
+              {% else %}
+              <tr>
+                <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <div class="flex px-2 py-1">
+
+                    <div class="flex flex-col justify-center ">
+                      <h6 class="mb-0 text-sm leading-normal dark:text-white">{{invoice.invoice_no}}</h6>
+                      <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{invoice.invoice_date}}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <p class="mb-0 text-xs font-semibold leading-tight dark:text-white dark:opacity-80">{{invoice.taxtype}}</p>
+                  <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400"><b>{{invoice.grand_total}}</b> ({{invoice.total_tax}})</p>
+                </td>
+
+                <td class="p-2 text-sm leading-normal text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <span class="bg-gradient-to-tl from-emerald-500 to-teal-400 px-2.5 text-xs rounded-1.8 py-1.4 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white"
+                        {% if invoice.status == "updated" %} style="background: #efef37;" {% endif %} >{{invoice.buyer_name}}</span>
+                </td>
+
+                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <span class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">{{invoice.buyer_gstin}}</span>
+                </td>
+                <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <a href="edit-invoice/{{invoice.id}}" class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">
+                    <i class="mr-1 text-lg leading-none fas fa-pencil" style="color: #6612eb;"></i></a></a>
+
+                  <a href="generate-invoice-pdf/{{invoice.id}}" target="_blank" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
+                    <i class="mr-1 text-lg leading-none fas fa-print" style="color: #79b51d;"></i></a>
+
+                  <a href="delete-invoice/{{invoice.id}}" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
+                    <i class="mr-1 text-lg leading-none fas fa-trash" style="color: #ef6c37;"></i></a>
+                </td>
+              </tr>
+              {% endif %}
+
+              {% endfor %}
+              </tbody>
+            </table>
+            <div class="pagination-container" style="margin-left: 15px;">
+              <div>
+                Showing Page <strong>{{ pagination.page }}</strong> of <strong>{{ pagination.total_pages }}</strong> (Total {{ pagination.total_records }} records)
+              </div>
+
+              <div class="pagination-nav">
+                <!-- Previous Button -->
+                <a href="?page={{ pagination.prev_num }}" class="page-btn {% if not pagination.has_prev %}disabled{% endif %}">
+                  &laquo; Prev
+                </a>
+
+                <!-- Page Number Buttons -->
+                {% for p in range(1, pagination.total_pages + 1) %}
+                <a href="?page={{ p }}" class="page-btn {% if p == pagination.page %}active{% endif %}">
+                  {{ p }}
+                </a>
+                {% endfor %}
+
+                <!-- Next Button -->
+                <a style="margin-right: 15px;" href="?page={{ pagination.next_num }}" class="page-btn {% if not pagination.has_next %}disabled{% endif %}">
+                  Next &raquo;
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- card 2 -->
+
+  <div class="flex flex-wrap -mx-3">
+    <div class="flex-none w-full max-w-full px-3">
+      <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+          <h6 class="dark:text-white">Deleted Invoices</h6>
+        </div>
+        <div class="flex-auto px-0 pt-0 pb-2">
+          <div class="p-0 overflow-x-auto">
+            <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+              <thead class="align-bottom">
+              <tr>
+                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Invoice / Date</th>
+                <th class="px-6 py-3 pl-2 font-bold text-left uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Type / Grand Total(Tax)</th>
+                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Customer Name</th>
+                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none dark:border-white/40 dark:text-white text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">GST Number</th>
+                <th class="px-6 py-3 font-semibold capitalize align-middle bg-transparent border-b border-collapse border-solid shadow-none dark:border-white/40 dark:text-white tracking-none whitespace-nowrap text-slate-400 opacity-70"></th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for invoice in pagination.invoices %}
+              {% if invoice.status != "deleted" %}
+              {% else %}
+              <tr>
+                <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <div class="flex px-2 py-1">
+
+                    <div class="flex flex-col justify-center ">
+                      <h6 class="mb-0 text-sm leading-normal dark:text-white">{{invoice.invoice_no}}</h6>
+                      <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{invoice.invoice_date}}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <p class="mb-0 text-xs font-semibold leading-tight dark:text-white dark:opacity-80">{{invoice.taxtype}}</p>
+                  <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400"><b>{{invoice.grand_total}}</b> ({{invoice.total_tax}})</p>
+                </td>
+
+                <td class="p-2 text-sm leading-normal text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <span class="bg-gradient-to-tl from-emerald-500 to-teal-400 px-2.5 text-xs rounded-1.8 py-1.4 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white"
+                        {% if invoice.status == "deleted" %} style="background: #ef6c37;" {% endif %} >{{invoice.buyer_name}}</span>
+                </td>
+                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <span class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">{{invoice.buyer_gstin}}</span>
+                </td>
+                <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <a href="edit-invoice/{{invoice.id}}" class="text-xs font-semibold leading-tight dark:text-white dark:opacity-80 text-slate-400">
+                    <i class="mr-1 text-lg leading-none fas fa-pencil" style="color: #6612eb;"></i></a></a>
+
+                  <a href="generate-invoice-pdf/{{invoice.id}}" target="_blank" class="dark:text-white inline-block px-0 py-2.5 mb-0 ml-6 font-bold leading-normal text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer ease-in bg-150 text-sm active:opacity-85 hover:-translate-y-px tracking-tight-rem bg-x-25 text-slate-700">
+                    <i class="mr-1 text-lg leading-none fas fa-print" style="color: #79b51d;"></i></a>
+
+                </td>
+              </tr>
+              {% endif %}
+
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  {% include 'admin/includes/footer.html' %}
