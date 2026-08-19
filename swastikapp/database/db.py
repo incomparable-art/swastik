@@ -216,34 +216,6 @@ class MongoDatabase:
     ######################################################################################
     #                                   Customer
     #####################################################################################
-    def create_customer(
-            self,
-            name: str,
-            address: str,
-            tin: bytes | str,
-            contact: str = "",
-            user: str = "",
-            is_active: bool = True
-    ) -> Customer:
-        """Inserts a new customer into MongoDB and returns the created Customer object."""
-        now_str = datetime.now().strftime("%a %b %d %H:%M:%S %Y")
-
-        customer_doc = {
-            "name": name,
-            "address": address,
-            "tin": tin,
-            "contact": contact,
-            "user": user,
-            "is_active": is_active,
-            "created_date": now_str,
-            "updated_date": now_str
-        }
-
-        # insert_one mutates 'customer_doc' by adding the generated '_id'
-        self.db.customer.insert_one(customer_doc)
-
-        # Return the new Customer object (now has '_id' populated)
-        return Customer(customer_doc)
 
     def to_dict(self):
         return {
