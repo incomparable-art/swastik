@@ -14,19 +14,20 @@ def dashboard():
         total_tax, taxable_amount,  grand_total = 0, 0, 0
         d_total_tax, d_taxable_amount,  d_grand_total = 0, 0, 0
 
-        for invoice in invoices:
-            if invoice.status == "updated" or invoice.status == "created":
-                total_tax += int(float(invoice.total_tax))
-                taxable_amount += int(float(invoice.taxable_amount))
-                grand_total += int(float(invoice.grand_total))
-            elif invoice.status == "deleted":
-                d_total_tax += int(float(invoice.total_tax))
-                d_taxable_amount += int(float(invoice.taxable_amount))
-                d_grand_total += int(float(invoice.grand_total))
+        if len(invoices)>0:
+            for invoice in invoices:
+                if invoice.status == "updated" or invoice.status == "created":
+                    total_tax += int(float(invoice.total_tax))
+                    taxable_amount += int(float(invoice.taxable_amount))
+                    grand_total += int(float(invoice.grand_total))
+                elif invoice.status == "deleted":
+                    d_total_tax += int(float(invoice.total_tax))
+                    d_taxable_amount += int(float(invoice.taxable_amount))
+                    d_grand_total += int(float(invoice.grand_total))
 
-        p_total_tax = int(d_total_tax*100/total_tax)
-        p_taxable_amount = int(d_taxable_amount*100/taxable_amount)
-        p_grand_total = int(d_grand_total*100/grand_total)
+            p_total_tax = int(d_total_tax*100/total_tax)
+            p_taxable_amount = int(d_taxable_amount*100/taxable_amount)
+            p_grand_total = int(d_grand_total*100/grand_total)
 
         templateData = {
             'page': "Dashboard", 'users': all_users, 'user_count': len(all_users),
