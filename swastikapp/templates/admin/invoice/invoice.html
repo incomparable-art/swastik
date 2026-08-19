@@ -37,9 +37,6 @@
               <tbody>
               {% for invoice in pagination.invoices %}
               {% if invoice.status == "deleted" %}
-              <tr>
-                <td colspan="5" style="text-align: center;">No records found.</td>
-              </tr>
               {% else %}
               <tr>
                 <td class="p-2 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
@@ -77,6 +74,11 @@
                 </td>
               </tr>
               {% endif %}
+              {% else %}
+              <tr>
+                <td colspan="5" style="text-align: center;">No records found.</td>
+              </tr>
+              {% endfor %}
 
               {% endfor %}
               </tbody>
@@ -97,11 +99,6 @@
                 <a href="?page={{ p }}" class="page-btn {% if p == pagination.page %}active{% endif %}">
                   {{ p }}
                 </a>
-                {% else %}
-                <tr>
-                  <td colspan="5" style="text-align: center;">No records found.</td>
-                </tr>
-                {% endfor %}
 
                 <!-- Next Button -->
                 <a style="margin-right: 15px;" href="?page={{ pagination.next_num }}" class="page-btn {% if not pagination.has_next %}disabled{% endif %}">
