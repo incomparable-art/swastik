@@ -13,6 +13,7 @@ def dashboard():
         clients = mongo.get_all_customers()
         total_tax, taxable_amount,  grand_total = 0, 0, 0
         d_total_tax, d_taxable_amount,  d_grand_total = 0, 0, 0
+        p_total_tax, p_taxable_amount,  p_grand_total = 0, 0, 0
 
         if len(invoices)>0:
             for invoice in invoices:
