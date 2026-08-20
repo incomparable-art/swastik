@@ -97,6 +97,15 @@
       scroll-behavior: smooth;
       scroll-padding-top: 65px;
     }
+    .error-msg {
+      color: #dc3545;
+      font-size: 12px;
+      display: none;
+      margin-top: 4px;
+    }
+    .input-invalid {
+      border-color: #dc3545 !important;
+    }
   </style>
 </head>
 <body>
@@ -233,44 +242,82 @@
       <p>Fill out the details below and our service engineer will contact you within 4 hours.</p>
     </div>
 
-    <form method="post">
+    <form id="serviceForm" action="/submit-service-request" method="POST" novalidate>
       <div class="form-grid">
+
+        <!-- Full Name -->
         <div class="form-group">
-          <label>Full Name *</label>
-          <input type="text" required placeholder="John Doe" name="name">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" placeholder="John Doe" required minlength="3" maxlength="60">
+          <small class="error-msg" id="err-name"></small>
         </div>
+
+        <!-- Company -->
         <div class="form-group">
-          <label>Company / Organization *</label>
-          <input type="text" required placeholder="Pharma Corp Ltd" name="company">
+          <label for="company">Company / Organization *</label>
+          <input type="text" id="company" name="company" placeholder="Pharma Corp Ltd" required maxlength="100">
+          <small class="error-msg" id="err-company"></small>
         </div>
+
+        <!-- Phone -->
         <div class="form-group">
-          <label>Phone Number *</label>
-          <input type="tel" required placeholder="+91 9368206747" name="phone">
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" placeholder="+91 9368206747" required>
+          <small class="error-msg" id="err-phone"></small>
         </div>
+
+        <!-- Email + OTP -->
         <div class="form-group">
-          <label>Email Address *</label>
-          <input type="email" required placeholder="name@company.com" name="email">
+          <label for="email">Email Address *</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="email" id="email" name="email" placeholder="name@company.com" required style="flex: 1;">
+            <button type="button" id="btnSendOtp" class="btn" onclick="sendOTP()">Send OTP</button>
+          </div>
+          <small class="error-msg" id="err-email"></small>
         </div>
-        <div class="form-group">
-          <label>Instrument Type / Model</label>
-          <input type="text" placeholder="e.g., Waters Alliance 2695 / Agilent 1260" name="model">
+
+        <!-- OTP Input Box -->
+        <div class="form-group" id="otpGroup" style="display: none;">
+          <label for="otpInput">Enter 6-Digit OTP *</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" maxlength="6" placeholder="123456" id="otpInput">
+            <button type="button" class="btn" onclick="verifyOTP()">Verify OTP</button>
+          </div>
+          <small id="otpStatus" style="display: block; margin-top: 4px; font-weight: 500;"></small>
         </div>
+
+        <!-- Instrument Model -->
         <div class="form-group">
-          <label>Service Required *</label>
-          <select required name="service">
+          <label for="model">Instrument Type / Model</label>
+          <input type="text" id="model" name="model" placeholder="e.g., Waters Alliance 2695 / Agilent 1260" maxlength="120">
+          <small class="error-msg" id="err-model"></small>
+        </div>
+
+        <!-- Service Required -->
+        <div class="form-group">
+          <label for="service">Service Required *</label>
+          <select id="service" name="service" required>
             <option value="">Select Service Type</option>
             <option value="Breakdown Repair">Breakdown Repair</option>
             <option value="AMC / CMC Inquiry">AMC / CMC Inquiry</option>
             <option value="Calibration & PM">Calibration &amp; PM</option>
             <option value="IQ/OQ/PQ Validation">IQ/OQ/PQ Validation</option>
           </select>
+          <small class="error-msg" id="err-service"></small>
         </div>
+
+        <!-- Details -->
         <div class="form-group full">
-          <label>Issue / Requirement Details</label>
-          <textarea placeholder="Describe the problem, error codes, or calibration timeline..." name="detail"></textarea>
+          <label for="detail">Issue / Requirement Details</label>
+          <textarea id="detail" name="detail" maxlength="2000" placeholder="Describe the problem, error codes, or calibration timeline..."></textarea>
+          <small class="error-msg" id="err-detail"></small>
         </div>
+
       </div>
-      <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Submit Service Request</button>
+
+      <button type="submit" id="btnSubmit" class="btn" style="width: 100%; margin-top: 10px;">
+        Submit Service Request (Verify Email First)
+      </button>
     </form>
   </div>
 </div>
@@ -299,6 +346,211 @@
     <p>&copy; Swastik Technology &amp; Services. All Rights Reserved.</p>
   </div>
 </footer>
+<script>
 
+  let isVerified = false;
+
+  function validateAllFields() {
+    let isValid = true;
+
+    // Clear previous errors
+    document.querySelectorAll('.error-msg').forEach(el => { el.style.display = 'none'; el.innerText = ''; });
+    document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('input-invalid'));
+
+    const showError = (fieldId, msg) => {
+      const el = document.getElementById(fieldId);
+      const errEl = document.getElementById(`err-${fieldId}`);
+      if (el) el.classList.add('input-invalid');
+      if (errEl) {
+        errEl.innerText = msg;
+        errEl.style.display = 'block';
+      }
+      isValid = false;
+    };
+
+    // Name
+    const name = document.getElementById('name').value.trim();
+    if (!name) {
+      showError('name', '"Full Name" is required.');
+    }
+    else if (name.length < 3) {
+      showError('name', '"Full Name" must be at least 3 characters.');
+    }
+
+    // Company
+    const company = document.getElementById('company').value.trim();
+    if (!company) {
+      showError('company', '"Company/Organization" is required.');
+    }
+    else if (company.length < 3) {
+      showError('company', '"Company/Organization" must be at least 3 characters.');
+    }
+
+    // Phone
+    const phone = document.getElementById('phone').value.trim().replace(/[\s\-\(\)]/g, '');
+    const phoneRegex = /^(\+?\d{1,3})?[6-9]\d{9}$/;
+    if (!phone) {
+      showError('phone', '"Phone Number" is required.');
+    }
+    else if (!phoneRegex.test(phone)) {
+      showError('phone', 'Please enter a valid "Phone Number".');
+    }
+
+    // Email
+    const email = document.getElementById('email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      showError('email', '"Email Address" is required.');
+    }
+    else if (!emailRegex.test(email)) {
+      showError('email', 'Please enter a valid "Email Address".');
+    }
+
+    // Model
+    const model = document.getElementById('model').value;
+    if (!model) {
+      showError('model', 'Please select a "Instrument Type/Model" type.');
+    }
+    else if (name.length < 5) {
+      showError('name', '"Instrument Type/Model" must be at least 5 characters.');
+    }
+
+    // Service
+    const service = document.getElementById('service').value;
+    if (!service) {
+      showError('service', 'Please select a "Service" type.');
+    }
+
+    // Detail
+    const detail = document.getElementById('detail').value.trim();
+    if (!detail) {
+      showError('detail', '"Issue / Requirement Details" is required.');
+    }
+    else if (detail.length < 20) {
+      showError('detail', '"Issue / Requirement Details" must be at least 20 characters.');
+    }
+
+    return isValid;
+  }
+
+  // Intercept form submission
+  document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    if (!validateAllFields()) return;
+
+    if (!isVerified) {
+      alert('Please verify your email with OTP first.');
+      return;
+    }
+
+    // Submit via fetch to handle JSON backend validation errors
+    const formData = new FormData(this);
+    try {
+      const res = await fetch('/submit-service-request', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        alert(result.message);
+        window.location.reload();
+      } else if (result.status === 'validation_failed') {
+        // Display backend errors on UI
+        Object.entries(result.errors).forEach(([field, msg]) => {
+          const errEl = document.getElementById(`err-${field}`);
+          if (errEl) {
+            errEl.innerText = msg;
+            errEl.style.display = 'block';
+          }
+        });
+      } else {
+        alert(result.error || 'Submission failed.');
+      }
+    } catch (err) {
+      alert('Network error occurred.');
+    }
+  });
+
+  async function sendOTP() {
+    const email = document.getElementById('email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      alert('Please enter your email first.');
+      return
+    }
+    else if (!emailRegex.test(email)) {
+      alert('Please enter a valid email.');
+      return
+    }
+
+    const btnSend = document.getElementById('btnSendOtp');
+    btnSend.innerText = 'Sending...';
+    btnSend.disabled = true;
+
+    try {
+      const res = await fetch('/api/send-otp/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById('otpGroup').style.display = 'block';
+        document.getElementById('otpStatus').innerText = 'OTP sent to your email!';
+        document.getElementById('otpStatus').style.color = 'green';
+        btnSend.innerText = 'Resend OTP';
+      } else {
+        alert(data.error || 'Failed to send OTP');
+        btnSend.innerText = 'Send OTP';
+      }
+    } catch (err) {
+      alert('Network error. Try again.');
+      btnSend.innerText = 'Send OTP';
+    } finally {
+      btnSend.disabled = false;
+    }
+  }
+
+  async function verifyOTP() {
+    const email = document.getElementById('email').value.trim();
+    const otp = document.getElementById('otpInput').value.trim();
+
+    if (!otp || otp.length < 4) {
+      alert('Please enter a valid OTP.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/verify-otp/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, otp: otp })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        isVerified = true;
+        document.getElementById('otpStatus').innerText = '✓ Email Verified Successfully';
+        document.getElementById('otpStatus').style.color = 'green';
+
+        // Enable Submit Button & Lock Email
+        document.getElementById('email').readOnly = true;
+        document.getElementById('otpInput').readOnly = true;
+        const submitBtn = document.getElementById('btnSubmit');
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Submit Service Request';
+      } else {
+        document.getElementById('otpStatus').innerText = 'Invalid or expired OTP.';
+        document.getElementById('otpStatus').style.color = 'red';
+      }
+    } catch (err) {
+      alert('Verification failed. Try again.');
+    }
+  }
+
+</script>
 </body>
 </html>

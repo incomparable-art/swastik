@@ -7,6 +7,7 @@ from datetime import datetime
 from swastikapp.database.user import User
 from swastikapp.database.customer import Customer
 from swastikapp.database.invoice import Invoice
+from flask_login import current_user
 
 load_dotenv()
 
@@ -48,6 +49,11 @@ class MongoDatabase:
         if filter_query is None:
             filter_query = {}
 
+        if current_user.role=="super_admin":
+            pass
+        else:
+            filter_query['user'] = current_user.email
+
         total_records = self.db.invoices.count_documents(filter_query)
         total_pages = math.ceil(total_records / per_page) if total_records > 0 else 1
 
@@ -83,7 +89,10 @@ class MongoDatabase:
     def get_all_invoices(self, limit: int = 10) -> list[Invoice]:
         """Retrieves all users from MongoDB and returns a list of User objects."""
         # find({}) retrieves all documents
-        invoice_cursor = self.db.invoices.find({})
+        if current_user.role=="super_admin":
+            invoice_cursor = self.db.invoices.find({})
+        else:
+            invoice_cursor = self.db.invoices.find({'user':current_user.email})
 
         if limit > 0:
             invoice_cursor = invoice_cursor.limit(limit)
@@ -93,7 +102,10 @@ class MongoDatabase:
     def get_invoice_by_id(self, invoice_id: str) -> Invoice | None:
         """Finds a user document by string ObjectId and returns a User object."""
         try:
-            invoice_doc = self.db.invoices.find_one({"_id": ObjectId(invoice_id)})
+            if current_user.role == "super_admin":
+                invoice_doc = self.db.invoices.find_one({"_id": ObjectId(invoice_id)})
+            else:
+                invoice_doc = self.db.invoices.find_one({"_id": ObjectId(invoice_id), 'user':current_user.email})
             return Invoice(invoice_doc) if invoice_doc else None
         except Exception:
             return None
@@ -102,7 +114,11 @@ class MongoDatabase:
         """Fetch all invoices based on status'."""
         try:
             # Query documents based on status
-            cursor = self.db.invoices.find({"status": status}).sort("_id", -1)
+            if current_user.role == "super_admin":
+                cursor = self.db.invoices.find({"status": status}).sort("_id", -1)
+
+            else:
+                cursor = self.db.invoices.find({"status": status, 'user':current_user.email}).sort("_id", -1)
 
             status_list = []
             for doc in cursor:
@@ -190,11 +206,6 @@ class MongoDatabase:
         user_doc = self.db.user.find_one({"email": email})
         return User(user_doc) if user_doc else None
 
-    def get_customer_by_tin(self, tin: str) -> Customer | None:
-        """Finds a user document by tin and returns a Customer object."""
-        customer_doc = self.db.customer.find_one({"tin": tin})
-        return Customer(customer_doc) if customer_doc else None
-
     def get_user_by_id(self, user_id: str) -> User | None:
         """Finds a user document by string ObjectId and returns a User object."""
         try:
@@ -206,7 +217,10 @@ class MongoDatabase:
     def get_all_users(self, limit: int = 10) -> list[User]:
         """Retrieves all users from MongoDB and returns a list of User objects."""
         # find({}) retrieves all documents
-        user_cursor = self.db.user.find({})
+        if current_user.role == "super_admin":
+            user_cursor = self.db.user.find({})
+        else:
+            user_cursor = self.db.user.find({'email':current_user.email})
 
         if limit > 0:
             user_cursor = user_cursor.limit(limit)
@@ -225,6 +239,14 @@ class MongoDatabase:
             'phone': self.phone
         }
 
+    def get_customer_by_tin(self, tin: str) -> Customer | None:
+        """Finds a user document by tin and returns a Customer object."""
+        if current_user.role=="super_admin":
+            customer_doc = self.db.customer.find_one({"tin": tin})
+        else:
+            customer_doc = self.db.customer.find_one({"tin": tin, 'user':current_user.email})
+        return Customer(customer_doc) if customer_doc else None
+
     def update_customer(self, id, data):
         """Update fields for a specific customer."""
         try:
@@ -240,18 +262,27 @@ class MongoDatabase:
 
     def get_customer_by_tin(self, tin: str) -> Customer | None:
         """Finds a user document by tin and returns a Customer object."""
-        customer_doc = self.db.customer.find_one({"tin": tin})
+        if current_user.role=="super_admin":
+            customer_doc = self.db.customer.find_one({"tin": tin})
+        else:
+            customer_doc = self.db.customer.find_one({"tin": tin, 'user':current_user.email})
         return Customer(customer_doc) if customer_doc else None
 
     def get_customer_by_id(self, id: str) -> Customer | None:
         """Finds a user document by tin and returns a Customer object."""
-        customer_doc = self.db.customer.find_one({"_id": ObjectId(id)})
+        if current_user.role=="super_admin":
+            customer_doc = self.db.customer.find_one({"_id": ObjectId(id)})
+        else:
+            customer_doc = self.db.customer.find_one({"_id": ObjectId(id), 'user':current_user.email})
         return Customer(customer_doc) if customer_doc else None
 
     def get_all_customers(self, limit: int = 10) -> list[Customer]:
         """Retrieves all users from MongoDB and returns a list of User objects."""
         # find({}) retrieves all documents
-        customer_cursor = self.db.customer.find({})
+        if current_user.role=="super_admin":
+            customer_cursor = self.db.customer.find({})
+        else:
+            customer_cursor = self.db.customer.find({'user':current_user.email})
 
         if limit > 0:
             customer_cursor = customer_cursor.limit(limit)

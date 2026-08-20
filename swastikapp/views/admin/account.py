@@ -62,7 +62,7 @@ def login():
                 user = mongo.get_user_by_email(email)
                 # Check password hash (handling bytes or str)
                 if user and bcrypt.check_password_hash(user.pw_hash, password):
-                    if user.role == "admin":
+                    if user.role == "admin" or user.role == "super_admin":
                         # Wrap in User class and log in directly
                         session.permanent = True
                         login_user(user, remember=remember)

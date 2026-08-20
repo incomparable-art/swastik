@@ -1,5 +1,5 @@
 from swastikapp import app
-from swastikapp.views.user.website import index
+from swastikapp.views.user.website import index, send_otp, verify_otp, submit_service_request
 from swastikapp.views.admin.account import login, signup, logout
 
 from swastikapp.views.admin.dashboad import dashboard, virtual, rtl, profile
@@ -61,6 +61,18 @@ def route_admin_logout():
 @app.route('/', methods=['GET', 'POST'])
 def route_index():
     return index()
+
+@app.route('/api/send-otp/', methods=['POST'])
+def route_send_otp():
+    return send_otp()
+
+@app.route('/api/verify-otp/', methods=['POST'])
+def route_verify_otp():
+    return verify_otp()
+
+@app.route('/submit-service-request', methods=['POST'])
+def route_submit_service_request():
+    return submit_service_request()
 
 #################################################################################
 #                                                                               #

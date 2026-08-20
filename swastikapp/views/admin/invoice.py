@@ -1,3 +1,5 @@
+from flask_login import current_user
+
 from swastikapp.database.db import MongoDatabase
 from flask import render_template, request, make_response, redirect, url_for
 import pdfkit
@@ -84,6 +86,7 @@ def edit_invoice(invoice_id):
         # 2. Package all invoice data
         templateData = {
             'invoice_no': request.form.get('invoice_no'),
+            'user':current_user.email,
             'invoice_date': request.form.get('invoice_date'),
             'place_of_supply': request.form.get('place_of_supply'),
             'reverse_charge': request.form.get('reverse_charge'),
@@ -177,6 +180,7 @@ def generate_invoice_pdf():
     # 2. Package all invoice data
     templateData = {
         'invoice_no': request.form.get('invoice_no'),
+        'user': current_user.email,
         'invoice_date': request.form.get('invoice_date'),
         'place_of_supply': request.form.get('place_of_supply'),
         'reverse_charge': request.form.get('reverse_charge'),
